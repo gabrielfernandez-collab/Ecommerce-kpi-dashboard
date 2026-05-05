@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nova Trail Ecommerce Redesign</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Nova Trail home">
+        <span class="brand-mark">NT</span>
+        <span>Nova Trail</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#shop">Shop</a>
+        <a href="#bundles">Bundles</a>
+        <a href="#shipping">Shipping</a>
+      </nav>
+      <button class="cart-button" id="cart-button" type="button" aria-label="Open cart">
+        Cart <span id="cart-count">0</span>
+      </button>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-media" aria-hidden="true"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Spring operations edit</p>
+          <h1>Daily carry that arrives on time.</h1>
+          <p class="hero-copy">
+            Best sellers, stock-aware bundles, and regional delivery promises tuned from the April ecommerce KPI snapshot.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#shop">Shop fast movers</a>
+            <a class="secondary-link" href="#bundles">Build a bundle</a>
+          </div>
+        </div>
+        <div class="hero-strip" aria-label="Store promises">
+          <span><strong>94.6%</strong> on-time ship rate</span>
+          <span><strong>4.7x</strong> ROAS winners promoted</span>
+          <span><strong>38.6%</strong> repeat-ready assortment</span>
+        </div>
+      </section>
+
+      <section class="store-tools" aria-label="Shopping preferences">
+        <div>
+          <p class="eyebrow">Performance strategy</p>
+          <h2>Convert the traffic already coming in.</h2>
+        </div>
+        <div class="tool-controls">
+          <label>
+            Fulfillment region
+            <select id="region-select">
+              <option value="na">North America</option>
+              <option value="eu">Europe</option>
+              <option value="apac">APAC</option>
+            </select>
+          </label>
+          <label>
+            Shopping mode
+            <select id="mode-select">
+              <option value="all">All products</option>
+              <option value="fast">Fast movers</option>
+              <option value="bundle">Bundle value</option>
+              <option value="risk">Low stock</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="shop-layout" id="shop">
+        <aside class="strategy-panel" aria-label="Recommended actions">
+          <h2>Actions from the dashboard</h2>
+          <div class="action-list">
+            <article>
+              <span class="dot rose"></span>
+              <div>
+                <h3>Recover conversion</h3>
+                <p>Move best sellers and delivery dates above the fold to address the 0.3 point conversion drag.</p>
+              </div>
+            </article>
+            <article>
+              <span class="dot amber"></span>
+              <div>
+                <h3>Protect scarce inventory</h3>
+                <p>Hydra Bottle and Trail Pack get clear stock signals and reorder messaging before checkout.</p>
+              </div>
+            </article>
+            <article>
+              <span class="dot blue"></span>
+              <div>
+                <h3>Clear overstock</h3>
+                <p>Core Tee inventory is paired into bundles to raise AOV without more paid acquisition.</p>
+              </div>
+            </article>
+            <article>
+              <span class="dot green"></span>
+              <div>
+                <h3>Reduce SLA anxiety</h3>
+                <p>Regional promise copy adapts because APAC and Newark-style lanes need extra expectation control.</p>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <section class="product-section" aria-label="Products">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Shop the optimized assortment</p>
+              <h2 id="product-heading">Fast movers and margin builders</h2>
+            </div>
+            <p id="delivery-promise" class="delivery-promise">Ships in 1-2 business days from the closest fulfillment lane.</p>
+          </div>
+          <div class="product-grid" id="product-grid"></div>
+        </section>
+      </section>
+
+      <section class="bundle-band" id="bundles">
+        <div>
+          <p class="eyebrow">Bundle path</p>
+          <h2>Raise AOV while fixing inventory imbalance.</h2>
+          <p>
+            Pair low-stock demand drivers with balanced or overstocked essentials, then reserve the strongest direct and email
+            traffic for these higher-margin sets.
+          </p>
+        </div>
+        <div class="bundle-builder">
+          <div class="bundle-total">
+            <span>Recommended bundle</span>
+            <strong>$92</strong>
+            <small>Estimated margin lift: +3.4 pts</small>
+          </div>
+          <button type="button" id="bundle-button">Add recommended bundle</button>
+        </div>
+      </section>
+
+      <section class="shipping-band" id="shipping">
+        <article>
+          <span>01</span>
+          <h3>Promise by lane</h3>
+          <p>Show exact delivery confidence by region before shoppers enter checkout.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Route critical orders</h3>
+          <p>Keep Newark pressure out of the customer experience with proactive carrier exceptions.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Prioritize direct</h3>
+          <p>Direct traffic has stronger conversion potential, so the redesign gives it the cleanest purchase path.</p>
+        </article>
+      </section>
+    </main>
+
+    <aside class="cart-drawer" id="cart-drawer" aria-live="polite" aria-label="Cart summary">
+      <div class="cart-head">
+        <strong>Cart</strong>
+        <button type="button" id="close-cart" aria-label="Close cart">Close</button>
+      </div>
+      <div id="cart-items" class="cart-items">
+        <p>Your cart is empty.</p>
+      </div>
+      <div class="cart-footer">
+        <span>Subtotal</span>
+        <strong id="cart-total">$0</strong>
+      </div>
+    </aside>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

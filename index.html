@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ecommerce Command Center</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-skin="command">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Dashboard navigation">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">EC</span>
+          <div>
+            <strong>Ecommerce Command Center</strong>
+            <span>Boardroom operating system</span>
+          </div>
+        </div>
+
+        <nav class="nav-list">
+          <a class="active" href="#overview">Overview</a>
+          <a href="#economics">Economics</a>
+          <a href="#funnel">Funnel</a>
+          <a href="#products">Products</a>
+          <a href="#operations">Operations</a>
+          <a href="#customers">Customers</a>
+          <a href="#risks">Risks</a>
+        </nav>
+
+        <section class="side-score" aria-label="Commerce health score">
+          <span>Commerce health</span>
+          <strong id="health-score">91</strong>
+          <small id="health-copy">Growth strong, fulfillment pressure contained.</small>
+          <div class="mini-progress" aria-hidden="true"><span id="health-fill"></span></div>
+        </section>
+
+        <section class="sidebar-panel" aria-label="Priority signals">
+          <span>Priority signals</span>
+          <ul id="signal-list"></ul>
+        </section>
+      </aside>
+
+      <main class="dashboard">
+        <section class="utility-bar" aria-label="Dashboard utilities">
+          <label class="search-box">
+            <span class="visually-hidden">Search</span>
+            <input type="search" placeholder="Search" />
+          </label>
+          <div class="utility-actions" aria-label="Quick actions">
+            <div class="theme-toggle" role="group" aria-label="Theme mode">
+              <button class="active" type="button" data-theme-option="light" aria-label="Use light mode" aria-pressed="true">◐</button>
+              <button type="button" data-theme-option="dark" aria-label="Use dark mode" aria-pressed="false">●</button>
+            </div>
+            <button type="button" aria-label="Log out">↪ Log Out</button>
+          </div>
+        </section>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">May 1, 2026 executive snapshot</p>
+            <h1>Ecommerce Command Center</h1>
+            <p class="page-copy">
+              Revenue, margin, acquisition, inventory, fulfillment, customer quality, and web performance in one
+              decision-grade view.
+            </p>
+          </div>
+          <section class="command-brief" aria-label="Executive command brief">
+            <div class="brief-main">
+              <span>AI Command Brief</span>
+              <strong id="brief-headline">Revenue velocity is above plan.</strong>
+              <p id="brief-copy">Protect scarce inventory, scale bundle paths, and keep fulfillment promises conservative.</p>
+            </div>
+            <div class="brief-score">
+              <span>Opportunity</span>
+              <strong id="brief-opportunity">$410K</strong>
+              <small>Projected EBIT upside</small>
+            </div>
+            <div class="brief-pulse" aria-hidden="true">
+              <i style="height: 42%"></i>
+              <i style="height: 58%"></i>
+              <i style="height: 48%"></i>
+              <i style="height: 72%"></i>
+              <i style="height: 64%"></i>
+              <i style="height: 88%"></i>
+              <i style="height: 76%"></i>
+            </div>
+          </section>
+          <section class="hero-carousel" aria-label="Ecommerce command highlights">
+            <div class="carousel-viewport">
+              <article class="carousel-slide active">
+                <img src="./performance-redesign/assets/operations-hero.png" alt="Operations planning desk with ecommerce products" />
+                <div>
+                  <span>Ops signal</span>
+                  <strong>Fulfillment pressure mapped to revenue risk.</strong>
+                </div>
+              </article>
+              <article class="carousel-slide">
+                <img src="./performance-redesign/assets/product-bottle.jpg" alt="Green reusable bottle product hero" />
+                <div>
+                  <span>Inventory signal</span>
+                  <strong>Hydra scarcity protected by price and allocation.</strong>
+                </div>
+              </article>
+              <article class="carousel-slide">
+                <img src="./performance-redesign/assets/product-backpack.jpg" alt="Green backpack product hero" />
+                <div>
+                  <span>Growth signal</span>
+                  <strong>Best sellers linked to margin and channel quality.</strong>
+                </div>
+              </article>
+            </div>
+            <div class="carousel-dots" aria-label="Carousel slides">
+              <button class="active" type="button" data-carousel-dot="0" aria-label="Show operations highlight"></button>
+              <button type="button" data-carousel-dot="1" aria-label="Show inventory highlight"></button>
+              <button type="button" data-carousel-dot="2" aria-label="Show growth highlight"></button>
+            </div>
+          </section>
+          <div class="topbar-controls">
+            <div class="skin-toggle" role="group" aria-label="Dashboard skin">
+              <div class="skin-options">
+                <strong>Report View</strong>
+                <button class="active" type="button" data-skin-option="command" aria-pressed="true">
+                  <span>Command</span>
+                  <i aria-hidden="true"></i>
+                </button>
+                <button type="button" data-skin-option="powerbi" aria-pressed="false">
+                  <span>PowerBI</span>
+                  <i aria-hidden="true"></i>
+                </button>
+                <button type="button" data-skin-option="tableau" aria-pressed="false">
+                  <span>Tableau</span>
+                  <i aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+            <section class="filters" aria-label="Dashboard filters">
+              <label>
+                Window
+                <select id="range-filter">
+                  <option value="30">Last 30 days</option>
+                  <option value="14">Last 14 days</option>
+                  <option value="7">Last 7 days</option>
+                </select>
+              </label>
+              <label>
+                Channel
+                <select id="channel-filter">
+                  <option value="all">All channels</option>
+                  <option value="direct">Direct</option>
+                  <option value="paid">Paid media</option>
+                  <option value="marketplace">Marketplace</option>
+                  <option value="email">Email/SMS</option>
+                </select>
+              </label>
+              <label>
+                Region
+                <select id="region-filter">
+                  <option value="all">Global</option>
+                  <option value="na">North America</option>
+                  <option value="eu">Europe</option>
+                  <option value="apac">APAC</option>
+                </select>
+              </label>
+              <label>
+                Segment
+                <select id="segment-filter">
+                  <option value="all">All customers</option>
+                  <option value="new">New customers</option>
+                  <option value="returning">Returning customers</option>
+                  <option value="vip">VIP cohort</option>
+                </select>
+              </label>
+              <label>
+                Scenario
+                <select id="scenario-filter">
+                  <option value="base">Base case</option>
+                  <option value="growth">Growth push</option>
+                  <option value="profit">Profit mode</option>
+                  <option value="risk">Risk-off</option>
+                </select>
+              </label>
+            </section>
+          </div>
+        </header>
+
+        <section class="scenario-strip" aria-label="Scenario impact">
+          <article>
+            <span>Scenario revenue</span>
+            <strong id="scenario-revenue">$4.82M</strong>
+            <small id="scenario-revenue-copy">Base operating case</small>
+          </article>
+          <article>
+            <span>EBIT impact</span>
+            <strong id="scenario-ebit">$0</strong>
+            <small id="scenario-ebit-copy">No scenario adjustment</small>
+          </article>
+          <article>
+            <span>Customer trust</span>
+            <strong id="scenario-trust">Stable</strong>
+            <small id="scenario-trust-copy">Promise quality protected</small>
+          </article>
+          <article>
+            <span>Execution load</span>
+            <strong id="scenario-load">Medium</strong>
+            <small id="scenario-load-copy">Current team can absorb</small>
+          </article>
+        </section>
+
+        <section class="briefing-strip" aria-label="Executive briefing">
+          <article>
+            <span>Projected month</span>
+            <strong id="month-projection">$9.9M</strong>
+            <small id="projection-gap">+$1.1M vs plan</small>
+          </article>
+          <article>
+            <span>Contribution profit</span>
+            <strong id="contribution-profit">$1.21M</strong>
+            <small id="profit-gap">25.1% of revenue</small>
+          </article>
+          <article>
+            <span>Cash in inventory</span>
+            <strong id="cash-inventory">$2.7M</strong>
+            <small id="inventory-copy">19.4% trapped in slow movers</small>
+          </article>
+          <article>
+            <span>Decision queue</span>
+            <strong id="decision-count">6</strong>
+            <small>Actions ranked by EBIT impact</small>
+          </article>
+        </section>
+
+        <section class="summary-grid" aria-label="Top KPIs">
+          <article class="kpi-card accent-blue">
+            <span class="kpi-label">Net revenue</span>
+            <strong id="revenue-kpi">$4.82M</strong>
+            <small id="revenue-delta" class="positive">+12.4% vs prior</small>
+          </article>
+          <article class="kpi-card accent-green">
+            <span class="kpi-label">Gross margin</span>
+            <strong id="margin-kpi">42.8%</strong>
+            <small id="margin-delta" class="positive">+2.1 pts</small>
+          </article>
+          <article class="kpi-card accent-teal">
+            <span class="kpi-label">Conversion rate</span>
+            <strong id="conversion-kpi">3.64%</strong>
+            <small id="conversion-delta" class="negative">-0.3 pts</small>
+          </article>
+          <article class="kpi-card accent-amber">
+            <span class="kpi-label">Average order value</span>
+            <strong id="aov-kpi">$71.90</strong>
+            <small id="aov-delta" class="positive">+4.6% vs prior</small>
+          </article>
+          <article class="kpi-card accent-rose">
+            <span class="kpi-label">CAC</span>
+            <strong id="cac-kpi">$31.40</strong>
+            <small id="cac-delta" class="neutral">Within target band</small>
+          </article>
+          <article class="kpi-card accent-indigo">
+            <span class="kpi-label">LTV:CAC</span>
+            <strong id="ltv-kpi">4.8x</strong>
+            <small id="ltv-delta" class="positive">+0.4x vs prior</small>
+          </article>
+          <article class="kpi-card accent-cyan">
+            <span class="kpi-label">On-time ship</span>
+            <strong id="ship-kpi">94.6%</strong>
+            <small id="ship-delta" class="positive">+1.8 pts</small>
+          </article>
+          <article class="kpi-card accent-slate">
+            <span class="kpi-label">Return rate</span>
+            <strong id="return-kpi">6.8%</strong>
+            <small id="return-delta" class="positive">-0.9 pts vs prior</small>
+          </article>
+        </section>
+
+        <section class="opportunity-radar" id="opportunity-radar" aria-label="Opportunity radar">
+          <div class="radar-hero">
+            <span>Opportunity radar</span>
+            <strong id="radar-upside">$0</strong>
+            <small id="radar-copy">Filtering the operating model for the highest-confidence next moves.</small>
+            <div class="radar-score" aria-label="Opportunity confidence">
+              <i id="radar-score-fill"></i>
+            </div>
+          </div>
+          <div class="radar-map" id="radar-map"></div>
+          <div class="radar-timeline" id="radar-timeline"></div>
+        </section>
+
+        <section class="state-demand-panel" aria-label="United States demand map">
+          <div class="state-map-head">
+            <div>
+              <span class="mini-label">State demand map</span>
+              <h2>Demand by state</h2>
+            </div>
+            <div class="state-legend" aria-label="State demand legend">
+              <span><i class="legend-high"></i> Purchases more</span>
+              <span><i class="legend-low"></i> Purchases less</span>
+              <span><i class="legend-opportunity"></i> Opportunity</span>
+            </div>
+          </div>
+          <div class="state-map-layout">
+            <div class="state-geo-map" id="state-geo-map">
+              <div class="real-us-map-frame">
+                <object class="real-us-map" data="./assets/us-map.svg" type="image/svg+xml" aria-label="United States map with state boundaries">
+                  United States map with state boundaries
+                </object>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <article class="panel xwide" id="overview">
+            <div class="panel-head">
+              <div>
+                <h2>Revenue, Orders, and Forecast</h2>
+                <p>Daily sales velocity with order volume, forecast band, and current run-rate pressure.</p>
+              </div>
+              <span id="trend-status" class="status-pill">Tracking above plan</span>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="revenue-chart" height="320" aria-label="Revenue, orders, and forecast trend"></canvas>
+              <div class="chart-tooltip" id="revenue-chart-tooltip" role="status" aria-live="polite"></div>
+            </div>
+            <div class="chart-metrics" id="chart-metrics"></div>
+          </article>
+
+          <article class="panel" id="economics">
+            <div class="panel-head">
+              <div>
+                <h2>Profit Waterfall</h2>
+                <p>Revenue to contribution after COGS, media, shipping, returns, and fees.</p>
+              </div>
+            </div>
+            <div class="waterfall" id="profit-waterfall"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Channel Economics</h2>
+                <p>Contribution quality by acquisition source.</p>
+              </div>
+            </div>
+            <div class="channel-economics" id="channel-economics"></div>
+          </article>
+
+          <article class="panel" id="funnel">
+            <div class="panel-head">
+              <div>
+                <h2>Customer Funnel</h2>
+                <p>Traffic, intent, checkout progression, and purchase yield.</p>
+              </div>
+            </div>
+            <div class="funnel-list" id="funnel-list"></div>
+          </article>
+
+          <article class="panel" id="checkout-health-panel">
+            <div class="panel-head">
+              <div>
+                <h2>Checkout Health</h2>
+                <p>Cart friction, payment reliability, and web performance.</p>
+              </div>
+            </div>
+            <div class="diagnostic-grid" id="checkout-health"></div>
+          </article>
+
+          <article class="panel wide" id="merchandising">
+            <div class="panel-head">
+              <div>
+                <h2>Merchandising Matrix</h2>
+                <p>Category-level demand, margin quality, stock posture, and pricing move.</p>
+              </div>
+            </div>
+            <div class="merch-grid" id="merch-grid"></div>
+          </article>
+
+          <article class="panel wide" id="products">
+            <div class="panel-head">
+              <div>
+                <h2>Product Command Table</h2>
+                <p>SKU-level revenue, margin, inventory cover, return drag, and next best action.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Revenue</th>
+                    <th>Margin</th>
+                    <th>Units</th>
+                    <th>Cover</th>
+                    <th>Return</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="product-table"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Inventory Exposure</h2>
+                <p>Stockout risk, overstock, aged cash, and reorder urgency.</p>
+              </div>
+            </div>
+            <div class="inventory-list" id="inventory-list"></div>
+          </article>
+
+          <article class="panel wide" id="operations">
+            <div class="panel-head">
+              <div>
+                <h2>Fulfillment Control Tower</h2>
+                <p>Warehouse backlog, SLA risk, labor rate, carrier exceptions, and customer impact.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Node</th>
+                    <th>Open orders</th>
+                    <th>At-risk SLA</th>
+                    <th>Pick rate</th>
+                    <th>Ship cost</th>
+                    <th>Carrier issues</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="warehouse-table"></tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel" id="customers">
+            <div class="panel-head">
+              <div>
+                <h2>Customer Intelligence</h2>
+                <p>Retention, cohort value, repeat order quality, and loyalty signal.</p>
+              </div>
+            </div>
+            <div class="customer-grid" id="customer-grid"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Cohort Economics</h2>
+                <p>New, returning, and VIP economics by quality and cash recovery.</p>
+              </div>
+            </div>
+            <div class="cohort-list" id="cohort-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Marketing Efficiency</h2>
+                <p>ROAS, MER, CAC, incrementality, and payback discipline.</p>
+              </div>
+            </div>
+            <div class="metric-stack" id="marketing-metrics"></div>
+          </article>
+
+          <article class="panel" id="promotion-calendar-panel">
+            <div class="panel-head">
+              <div>
+                <h2>Promotion Calendar</h2>
+                <p>Commercial events, expected lift, margin guardrails, and ops readiness.</p>
+              </div>
+            </div>
+            <div class="promo-list" id="promo-list"></div>
+          </article>
+
+          <article class="panel wide">
+            <div class="panel-head">
+              <div>
+                <h2>Executive Action Board</h2>
+                <p>Board-level moves ranked by revenue, EBIT, customer trust, and execution urgency.</p>
+              </div>
+            </div>
+            <div class="action-board" id="action-board"></div>
+          </article>
+
+          <article class="panel wide" id="risks">
+            <div class="panel-head">
+              <div>
+                <h2>Risk Ledger</h2>
+                <p>Revenue, trust, cash, and execution risks with owners and mitigation status.</p>
+              </div>
+            </div>
+            <div class="risk-ledger" id="risk-ledger"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
