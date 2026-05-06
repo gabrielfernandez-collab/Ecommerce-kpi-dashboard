@@ -393,6 +393,34 @@ const scenarioEffects = {
   },
 };
 
+const filterLabels = {
+  channel: {
+    all: "All channels",
+    direct: "Direct",
+    paid: "Paid media",
+    marketplace: "Marketplace",
+    email: "Email/SMS",
+  },
+  region: {
+    all: "Global",
+    na: "North America",
+    eu: "Europe",
+    apac: "APAC",
+  },
+  segment: {
+    all: "All customers",
+    new: "New customers",
+    returning: "Returning",
+    vip: "VIP cohort",
+  },
+  scenario: {
+    base: "Base case",
+    growth: "Growth push",
+    profit: "Profit mode",
+    risk: "Risk-off",
+  },
+};
+
 const formatCurrency = (value) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
 
@@ -414,6 +442,9 @@ const formatKpiCurrency = (value) => {
 
   return formatCurrency(value);
 };
+
+const formatSignedKpiCurrency = (value) =>
+  value === 0 ? "$0" : `${value > 0 ? "+" : "-"}${formatKpiCurrency(Math.abs(value))}`;
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
@@ -538,12 +569,7 @@ function initHeaderCarousel() {
   }, 4600);
 }
 
-function getState() {
-  const range = document.querySelector("#range-filter").value;
-  const channel = document.querySelector("#channel-filter").value;
-  const region = document.querySelector("#region-filter").value;
-  const segment = document.querySelector("#segment-filter").value;
-  const scenario = document.querySelector("#scenario-filter").value;
+function createState({ range, channel, region, segment, scenario }) {
   const factor =
     multipliers.range[range] * multipliers.channel[channel] * multipliers.region[region] * multipliers.segment[segment];
 
@@ -559,6 +585,16 @@ function getState() {
     segmentEffect: segmentEffects[segment],
     scenarioEffect: scenarioEffects[scenario],
   };
+}
+
+function getState() {
+  const range = document.querySelector("#range-filter").value;
+  const channel = document.querySelector("#channel-filter").value;
+  const region = document.querySelector("#region-filter").value;
+  const segment = document.querySelector("#segment-filter").value;
+  const scenario = document.querySelector("#scenario-filter").value;
+
+  return createState({ range, channel, region, segment, scenario });
 }
 
 function calculateMetrics(state) {
@@ -949,6 +985,187 @@ function renderScenario(state) {
   document.querySelector("#scenario-load").textContent = state.scenarioEffect.load;
   document.querySelector("#scenario-load-copy").textContent =
     state.scenario === "growth" ? "Requires ops and creative capacity" : "Current team can absorb";
+}
+
+function renderImpactDecomposition(state) {
+  const metrics = calculateMetrics(state);
+  const noScenarioState = createState({
+    range: state.range,
+    channel: state.channel,
+    region: state.region,
+    segment: state.segment,
+    scenario: "base",
+  });
+  const noScenarioMetrics = calculateMetrics(noScenarioState);
+  const revenueDelta = metrics.revenue - noScenarioMetrics.revenue;
+  const ebitDelta = metrics.contributionProfit - noScenarioMetrics.contributionProfit;
+  const drivers = [
+    {
+      label: "Channel",
+      value: filterLabels.channel[state.channel],
+      score:
+        state.channelEffect.margin * 8 +
+        (1 - state.channelEffect.cac) * 18 +
+        state.channelEffect.conversion * 10 +
+        (state.channelEffect.aov - 1) * 22,
+      metric:
+        state.channel === "all"
+          ? "Neutral mix"
+          : `${state.channelEffect.margin >= 0 ? "+" : ""}${state.channelEffect.margin.toFixed(1)} margin pts`,
+      note:
+        state.channel === "paid"
+          ? "CAC pressure needs creative discipline."
+          : state.channel === "email"
+            ? "Retention channel is lifting quality."
+            : state.channel === "marketplace"
+              ? "Marketplace reach trades down margin."
+              : "Channel quality is inside plan.",
+    },
+    {
+      label: "Region",
+      value: filterLabels.region[state.region],
+      score:
+        state.regionEffect.ship * 8 -
+        state.regionEffect.risk * 5 -
+        state.regionEffect.returns * 6 +
+        (1 - state.regionEffect.cost) * 18,
+      metric:
+        state.region === "all"
+          ? "Blended ops"
+          : `${state.regionEffect.ship >= 0 ? "+" : ""}${state.regionEffect.ship.toFixed(1)} ship pts`,
+      note:
+        state.region === "apac"
+          ? "Delivery promise and carrier cost are the constraint."
+          : state.region === "eu"
+            ? "Returns and ship cost are slightly heavier."
+            : "Fulfillment quality supports conversion.",
+    },
+    {
+      label: "Segment",
+      value: filterLabels.segment[state.segment],
+      score:
+        state.segmentEffect.conversion * 10 +
+        (state.segmentEffect.ltv - 1) * 16 -
+        (state.segmentEffect.cac - 1) * 12 -
+        state.segmentEffect.returns * 5,
+      metric:
+        state.segment === "all"
+          ? "Full file"
+          : `${state.segmentEffect.conversion >= 0 ? "+" : ""}${state.segmentEffect.conversion.toFixed(2)} conv pts`,
+      note:
+        state.segment === "new"
+          ? "Scale carefully until payback quality improves."
+          : state.segment === "vip"
+            ? "High-value demand deserves inventory priority."
+            : "Customer quality supports efficient growth.",
+    },
+    {
+      label: "Scenario",
+      value: filterLabels.scenario[state.scenario],
+      score:
+        (state.scenarioEffect.revenue - 1) * 55 +
+        state.scenarioEffect.margin * 8 +
+        state.scenarioEffect.ship * 4 -
+        state.scenarioEffect.returns * 5 +
+        (1 - state.scenarioEffect.cac) * 18,
+      metric: `${formatSignedKpiCurrency(ebitDelta)} EBIT`,
+      note:
+        state.scenario === "growth"
+          ? "Upside is available, but execution load rises."
+          : state.scenario === "profit"
+            ? "Contribution improves with lighter spend."
+            : state.scenario === "risk"
+              ? "Trust is protected while demand is suppressed."
+              : "No scenario adjustment applied.",
+    },
+  ];
+  const maxScore = Math.max(...drivers.map((driver) => Math.abs(driver.score)), 1);
+  const operatingScore = Math.round(drivers.reduce((sum, driver) => sum + driver.score, 0));
+  const watchItems = [
+    {
+      title: "Checkout friction",
+      value: `${metrics.conversion.toFixed(2)}% conversion`,
+      severity: Math.max(0, base.conversion - metrics.conversion),
+      copy: "Expose delivery confidence and payment recovery before cart abandonment rises.",
+    },
+    {
+      title: "CAC ceiling",
+      value: `${formatCurrency(metrics.cac)} CAC`,
+      severity: Math.max(0, metrics.cac - base.cac) / 4,
+      copy: "Hold acquisition spend to cohorts and creatives that clear payback targets.",
+    },
+    {
+      title: "Fulfillment trust",
+      value: `${metrics.ship.toFixed(1)}% on-time`,
+      severity: Math.max(0, 94 - metrics.ship) / 2,
+      copy: "Tighten promise copy and route priority demand through healthier lanes.",
+    },
+    {
+      title: "Return leakage",
+      value: `${metrics.returnRate.toFixed(1)}% returns`,
+      severity: Math.max(0, metrics.returnRate - base.returnRate),
+      copy: "Use product detail fixes and post-purchase support to protect contribution.",
+    },
+  ]
+    .filter((item) => item.severity > 0)
+    .sort((a, b) => b.severity - a.severity)
+    .slice(0, 2);
+
+  const fallbackWatchItems = [
+    {
+      title: "Bundle ladder",
+      value: `${formatCurrency(metrics.aov)} AOV`,
+      copy: "Keep the Weekend Kit path prominent while conversion quality is stable.",
+    },
+    {
+      title: "Hydra allocation",
+      value: "9 days cover",
+      copy: "Reserve scarce inventory for high-LTV traffic and access moments.",
+    },
+  ];
+  const visibleWatchItems = watchItems.length ? watchItems : fallbackWatchItems;
+
+  document.querySelector("#impact-score").textContent = `${operatingScore >= 0 ? "+" : ""}${operatingScore}`;
+  document.querySelector("#impact-score").className = operatingScore >= 0 ? "positive" : "negative";
+  document.querySelector("#impact-summary-copy").textContent =
+    operatingScore >= 12
+      ? `Selected filters are improving operating quality; scenario adds ${formatSignedKpiCurrency(revenueDelta)} revenue.`
+      : operatingScore < -10
+        ? "Selected filters are exposing pressure points that should gate spend and promise quality."
+        : "Selected filters are balanced, with execution quality driving the next decision.";
+  document.querySelector("#impact-driver-grid").innerHTML = drivers
+    .map((driver) => {
+      const tone = driver.score > 4 ? "positive" : driver.score < -4 ? "negative" : "neutral";
+      const width = clamp((Math.abs(driver.score) / maxScore) * 100, 10, 100);
+      return `
+        <article class="impact-driver ${tone}">
+          <div class="impact-driver-head">
+            <span>${driver.label}</span>
+            <strong>${driver.value}</strong>
+          </div>
+          <div class="impact-meter" aria-label="${driver.label} score">
+            <i style="width:${width}%"></i>
+          </div>
+          <div class="impact-driver-meta">
+            <b>${driver.metric}</b>
+            <small>${driver.note}</small>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+  document.querySelector("#impact-watchlist").innerHTML = visibleWatchItems
+    .map(
+      (item) => `
+        <article class="impact-watch-item">
+          <span>Watch</span>
+          <strong>${item.title}</strong>
+          <small>${item.value}</small>
+          <p>${item.copy}</p>
+        </article>
+      `,
+    )
+    .join("");
 }
 
 function renderChartMetrics(metrics) {
@@ -1490,10 +1707,403 @@ function renderRiskLedger(state) {
     .join("");
 }
 
+function getTopOperatingRisk(state, metrics) {
+  if (state.region === "apac" || metrics.ship < 93) {
+    return {
+      title: "Fulfillment promise quality",
+      body: "Delivery confidence is the main constraint. Keep customer promises conservative and route priority orders through healthier lanes.",
+    };
+  }
+
+  if (state.channel === "paid" || metrics.cac > base.cac) {
+    return {
+      title: "Paid efficiency",
+      body: "CAC pressure can dilute EBIT. Refresh creative, hold spend caps, and shift demand toward direct capture and bundles.",
+    };
+  }
+
+  if (metrics.returnRate > base.returnRate) {
+    return {
+      title: "Return leakage",
+      body: "Returns are weighing on contribution. Improve PDP clarity and post-purchase support before scaling demand.",
+    };
+  }
+
+  return {
+    title: "Inventory allocation",
+    body: "Hydra scarcity and Core Tee overstock should be managed together through price discipline, access windows, and bundle design.",
+  };
+}
+
+function buildExecutiveReport(state) {
+  const metrics = calculateMetrics(state);
+  const baseScenarioMetrics = calculateMetrics(
+    createState({
+      range: state.range,
+      channel: state.channel,
+      region: state.region,
+      segment: state.segment,
+      scenario: "base",
+    }),
+  );
+  const projectedMonth = metrics.revenue * (30 / Number(state.range)) * 2.05;
+  const planGap = projectedMonth - 8800000 * multipliers.channel[state.channel] * multipliers.region[state.region];
+  const scenarioEbit = metrics.contributionProfit - baseScenarioMetrics.contributionProfit;
+  const risk = getTopOperatingRisk(state, metrics);
+  const thesis =
+    metrics.contributionMargin >= 25 && metrics.ship >= 94
+      ? "The business is healthy enough to keep scaling, but growth should stay tied to inventory and fulfillment controls."
+      : metrics.contributionMargin >= 25
+        ? "Profit quality is acceptable, but customer promise risk should govern how aggressively demand is pushed."
+        : "The current view needs tighter operating discipline before adding spend.";
+  const decision =
+    state.scenario === "growth"
+      ? "Approve staged growth only where SLA health and inventory cover remain inside guardrails."
+      : state.scenario === "profit"
+        ? "Stay in profit mode and use margin expansion to fund high-confidence bundle tests."
+        : state.scenario === "risk"
+          ? "Keep risk-off controls active until service quality and refund exposure stabilize."
+          : "Keep the base plan, but prioritize bundle ladder, Hydra allocation, and Newark recovery before expanding paid spend.";
+  const headline =
+    planGap >= 0
+      ? `Projected month is ${formatSignedKpiCurrency(planGap)} versus plan.`
+      : `Projected month is ${formatSignedKpiCurrency(planGap)} versus plan; protect margin before chasing volume.`;
+
+  return {
+    decision,
+    headline,
+    risk,
+    scenarioEbit,
+    thesis,
+    metrics: [
+      { label: "Revenue", value: formatKpiCurrency(metrics.revenue), note: `${formatCurrency(projectedMonth)} projected month` },
+      { label: "Contribution", value: formatKpiCurrency(metrics.contributionProfit), note: `${metrics.contributionMargin.toFixed(1)}% margin` },
+      { label: "Conversion", value: `${metrics.conversion.toFixed(2)}%`, note: `${formatCurrency(metrics.aov)} AOV` },
+      { label: "Trust", value: `${metrics.ship.toFixed(1)}%`, note: `${metrics.returnRate.toFixed(1)}% returns` },
+    ],
+    moves: [
+      "Protect Hydra inventory with price discipline and priority access for high-LTV traffic.",
+      "Push the Weekend Kit bundle path to lift AOV and absorb Core Tee overstock.",
+      state.channel === "paid"
+        ? "Hold paid spend until CAC and creative fatigue improve."
+        : "Shift incremental demand capture toward direct, email, and retention-ready audiences.",
+    ],
+  };
+}
+
+function buildExecutiveReportPage(state, report) {
+  const generatedAt = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date());
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CEO Operating Brief</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #182035;
+        --muted: #667085;
+        --soft: #98a2b3;
+        --line: #e4e8ef;
+        --page: #f5f7fb;
+        --panel: #ffffff;
+        --accent: #2f665a;
+        --accent-2: #d98245;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: Arial !important;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(245, 247, 251, 0.96) 320px),
+          var(--page);
+        font-family: Arial !important;
+        font-variant-numeric: tabular-nums;
+      }
+
+      button,
+      h1,
+      h2,
+      li,
+      p,
+      small,
+      span,
+      strong {
+        font-family: Arial !important;
+      }
+
+      main {
+        width: min(920px, calc(100% - 40px));
+        margin: 44px auto;
+        padding: clamp(28px, 5vw, 54px);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        box-shadow: 0 24px 70px rgba(24, 32, 53, 0.1);
+      }
+
+      header {
+        display: grid;
+        gap: 14px;
+        padding-bottom: 26px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow,
+      .label {
+        color: var(--muted);
+        font-size: 0.74rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        max-width: 22ch;
+        font-size: clamp(2rem, 4.8vw, 3.35rem);
+        font-weight: 720;
+        letter-spacing: -0.02em;
+        line-height: 1.02;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        font-weight: 650;
+      }
+
+      .meta span {
+        display: inline-flex;
+        align-items: center;
+        min-height: 28px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fbfcff;
+      }
+
+      .lead {
+        max-width: 64ch;
+        color: #344054;
+        font-size: 1.05rem;
+        font-weight: 520;
+        line-height: 1.62;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin: 26px 0;
+      }
+
+      .metric {
+        min-width: 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfcff;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 1.35rem;
+        font-weight: 780;
+        line-height: 1;
+        white-space: nowrap;
+      }
+
+      .metric small {
+        display: block;
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 650;
+        line-height: 1.35;
+      }
+
+      section {
+        padding: 22px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      section:first-of-type {
+        border-top: 0;
+      }
+
+      h2 {
+        margin-top: 8px;
+        font-size: 1.28rem;
+        font-weight: 720;
+        line-height: 1.12;
+      }
+
+      section p {
+        max-width: 68ch;
+        margin-top: 12px;
+        color: #475467;
+        font-size: 1rem;
+        font-weight: 520;
+        line-height: 1.62;
+      }
+
+      ol {
+        display: grid;
+        gap: 12px;
+        margin: 14px 0 0;
+        padding-left: 22px;
+        color: #344054;
+        font-size: 1rem;
+        font-weight: 620;
+        line-height: 1.48;
+      }
+
+      .watch {
+        padding: 20px;
+        border: 1px solid color-mix(in srgb, var(--accent-2) 38%, var(--line));
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--accent-2) 8%, #ffffff);
+      }
+
+      .watch small {
+        display: block;
+        margin-top: 12px;
+        color: var(--accent);
+        font-size: 0.82rem;
+        font-weight: 800;
+      }
+
+      footer {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+        color: var(--soft);
+        font-size: 0.78rem;
+        font-weight: 650;
+      }
+
+      @media (max-width: 720px) {
+        main {
+          width: min(100% - 24px, 920px);
+          margin: 12px auto;
+          padding: 24px;
+        }
+
+        .metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="eyebrow">CEO Operating Brief</span>
+        <h1>${report.headline}</h1>
+        <p class="lead">${report.thesis}</p>
+        <div class="meta">
+          <span>${filterLabels.channel[state.channel]}</span>
+          <span>${filterLabels.region[state.region]}</span>
+          <span>${filterLabels.segment[state.segment]}</span>
+          <span>${filterLabels.scenario[state.scenario]}</span>
+        </div>
+      </header>
+
+      <div class="metrics" aria-label="Key executive metrics">
+        ${report.metrics
+          .map(
+            (item) => `
+              <article class="metric">
+                <span class="label">${item.label}</span>
+                <strong>${item.value}</strong>
+                <small>${item.note}</small>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+
+      <section>
+        <span class="label">CEO decision</span>
+        <h2>Recommended direction</h2>
+        <p>${report.decision}</p>
+      </section>
+
+      <section>
+        <span class="label">Next 72 hours</span>
+        <h2>Priority actions</h2>
+        <ol>
+          ${report.moves.map((move) => `<li>${move}</li>`).join("")}
+        </ol>
+      </section>
+
+      <section class="watch">
+        <span class="label">Watch</span>
+        <h2>${report.risk.title}</h2>
+        <p>${report.risk.body}</p>
+        <small>Scenario EBIT impact: ${formatSignedKpiCurrency(report.scenarioEbit)}</small>
+      </section>
+
+      <footer>Generated from the Ecommerce Command Center on ${generatedAt}.</footer>
+    </main>
+  </body>
+</html>`;
+}
+
+function openExecutiveReport() {
+  const state = getState();
+  const report = buildExecutiveReport(state);
+  const reportPage = buildExecutiveReportPage(state, report);
+  const reportBlob = new Blob([reportPage], { type: "text/html" });
+  const reportUrl = URL.createObjectURL(reportBlob);
+  const reportWindow = window.open(reportUrl, "_blank");
+
+  if (!reportWindow) {
+    window.location.href = reportUrl;
+    return;
+  }
+
+  window.setTimeout(() => URL.revokeObjectURL(reportUrl), 30000);
+}
+
+function initExecutiveReport() {
+  document.querySelector("#generate-report-button")?.addEventListener("click", openExecutiveReport);
+}
+
 function render() {
   applySkin();
   const state = getState();
   renderScenario(state);
+  renderImpactDecomposition(state);
   renderKpis(state);
   renderOpportunityRadar(state);
   renderStateDemandMap(state);
@@ -1519,6 +2129,7 @@ restoreSkin();
 restoreTheme();
 initHeaderCarousel();
 initTrendTooltip();
+initExecutiveReport();
 document.querySelectorAll("[data-theme-option]").forEach((button) => {
   button.addEventListener("click", () => {
     applyTheme(button.dataset.themeOption);
