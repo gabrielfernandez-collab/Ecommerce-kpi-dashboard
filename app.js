@@ -2080,19 +2080,22 @@ function buildExecutiveReportPage(state, report) {
 }
 
 function openExecutiveReport() {
+  const reportWindow = window.open("about:blank", "_blank");
   const state = getState();
   const report = buildExecutiveReport(state);
   const reportPage = buildExecutiveReportPage(state, report);
-  const reportBlob = new Blob([reportPage], { type: "text/html" });
-  const reportUrl = URL.createObjectURL(reportBlob);
-  const reportWindow = window.open(reportUrl, "_blank");
 
-  if (!reportWindow) {
-    window.location.href = reportUrl;
+  if (reportWindow) {
+    reportWindow.opener = null;
+    reportWindow.document.open();
+    reportWindow.document.write(reportPage);
+    reportWindow.document.close();
     return;
   }
 
-  window.setTimeout(() => URL.revokeObjectURL(reportUrl), 30000);
+  const reportBlob = new Blob([reportPage], { type: "text/html" });
+  const reportUrl = URL.createObjectURL(reportBlob);
+  window.location.href = reportUrl;
 }
 
 function initExecutiveReport() {
