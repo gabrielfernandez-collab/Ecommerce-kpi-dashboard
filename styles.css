@@ -1417,6 +1417,14 @@ body[data-skin="command"] .panel.wide:last-of-type {
   grid-column: 1;
 }
 
+body[data-skin="command"] #products {
+  grid-column: 1 / -1;
+}
+
+body[data-skin="command"] #inventory-exposure {
+  grid-column: 1 / -1;
+}
+
 body[data-skin="command"] #merchandising {
   grid-column: 1 / -1;
 }
@@ -2929,6 +2937,9 @@ body[data-skin="command"] #promotion-calendar-panel .promo-item {
 
 .table-wrap {
   overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -2963,6 +2974,7 @@ td:nth-child(n + 2):not(:last-child) {
 td .badge {
   justify-content: center;
   min-width: 72px;
+  white-space: nowrap;
 }
 
 th {
@@ -2980,6 +2992,90 @@ tbody tr:last-child td {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+#products .table-wrap {
+  overflow-x: auto;
+}
+
+#products table {
+  min-width: 980px;
+  table-layout: fixed;
+}
+
+#products th:nth-child(1),
+#products td:nth-child(1) {
+  width: 32%;
+}
+
+#products th:nth-child(2),
+#products td:nth-child(2) {
+  width: 12%;
+}
+
+#products th:nth-child(3),
+#products td:nth-child(3),
+#products th:nth-child(4),
+#products td:nth-child(4),
+#products th:nth-child(6),
+#products td:nth-child(6) {
+  width: 9%;
+}
+
+#products th:nth-child(5),
+#products td:nth-child(5) {
+  width: 12%;
+  min-width: 112px;
+  text-align: center;
+}
+
+#products th:nth-child(7),
+#products td:nth-child(7) {
+  width: 17%;
+}
+
+#products td:nth-child(5) .badge {
+  min-width: 96px;
+  padding-inline: 12px;
+}
+
+body[data-skin="command"] #products table {
+  min-width: 760px;
+}
+
+body[data-skin="command"] #products th:nth-child(1),
+body[data-skin="command"] #products td:nth-child(1) {
+  width: 40%;
+}
+
+body[data-skin="command"] #products th:nth-child(2),
+body[data-skin="command"] #products td:nth-child(2) {
+  width: 16%;
+}
+
+body[data-skin="command"] #products th:nth-child(3),
+body[data-skin="command"] #products td:nth-child(3),
+body[data-skin="command"] #products th:nth-child(4),
+body[data-skin="command"] #products td:nth-child(4) {
+  width: 12%;
+}
+
+body[data-skin="command"] #products th:nth-child(5),
+body[data-skin="command"] #products td:nth-child(5) {
+  width: 20%;
+  min-width: 128px;
+}
+
+body[data-skin="command"] #products th:nth-child(6),
+body[data-skin="command"] #products td:nth-child(6),
+body[data-skin="command"] #products th:nth-child(7),
+body[data-skin="command"] #products td:nth-child(7) {
+  display: none;
+}
+
+body[data-skin="command"] #products td:nth-child(5) .badge {
+  min-width: 108px;
 }
 
 .product-cell img {
